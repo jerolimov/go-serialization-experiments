@@ -16,13 +16,15 @@ func TestSerialization(t *testing.T) {
 		expectedYAMLV2 string
 		expectedYAMLV3 string
 	}{
+		// OK
 		{
-			name:           "a simple string",
+			name:           "a string",
 			input:          "a string",
 			expectedJSON:   "\"a string\"",
 			expectedYAMLV2: "a string\n",
 			expectedYAMLV3: "a string\n",
 		},
+		// OK
 		{
 			name:           "an empty string list",
 			input:          []string{},
@@ -30,22 +32,44 @@ func TestSerialization(t *testing.T) {
 			expectedYAMLV2: "[]\n",
 			expectedYAMLV3: "[]\n",
 		},
+		// OK
 		{
-			name:           "a string list",
+			name:           "a string array",
 			input:          []string{"first string", "second string"},
 			expectedJSON:   "[\"first string\",\"second string\"]",
 			expectedYAMLV2: "- first string\n- second string\n",
 			expectedYAMLV3: "- first string\n- second string\n",
 		},
+
+		// How we can separate nil and [] ?
+		// We can't! nil and the empty array are exported as empty array.
 		{
-			name:           "object without any data in array",
+			name:           "ObjectWithStringArray without data",
 			input:          ObjectWithStringArray{},
 			expectedJSON:   "{\"data\":null}",
 			expectedYAMLV2: "data: []\n",
 			expectedYAMLV3: "data: []\n",
 		},
 		{
-			name: "object with data in array",
+			name: "ObjectWithStringArray with data: nil",
+			input: ObjectWithStringArray{
+				Data: nil,
+			},
+			expectedJSON:   "{\"data\":null}",
+			expectedYAMLV2: "data: []\n",
+			expectedYAMLV3: "data: []\n",
+		},
+		{
+			name: "ObjectWithStringArray with data: []string{}",
+			input: ObjectWithStringArray{
+				Data: []string{},
+			},
+			expectedJSON:   "{\"data\":[]}",
+			expectedYAMLV2: "data: []\n",
+			expectedYAMLV3: "data: []\n",
+		},
+		{
+			name: "ObjectWithStringArray with data in array",
 			input: ObjectWithStringArray{
 				Data: []string{"first string", "second string"},
 			},
@@ -53,17 +77,112 @@ func TestSerialization(t *testing.T) {
 			expectedYAMLV2: "data:\n- first string\n- second string\n",
 			expectedYAMLV3: "data:\n    - first string\n    - second string\n",
 		},
+
+		// How we can separate nil and [] ?
+		// We can! nil is exported as null and an empty array as empty array.
 		{
-			name:           "object with omit empty string without data",
+			name:           "ObjectWithPointerToStringArray without data",
+			input:          ObjectWithPointerToStringArray{},
+			expectedJSON:   "{\"data\":null}",
+			expectedYAMLV2: "data: null\n",
+			expectedYAMLV3: "data: null\n",
+		},
+		{
+			name: "ObjectWithPointerToStringArray with data: nil",
+			input: ObjectWithPointerToStringArray{
+				Data: nil,
+			},
+			expectedJSON:   "{\"data\":null}",
+			expectedYAMLV2: "data: null\n",
+			expectedYAMLV3: "data: null\n",
+		},
+		{
+			name: "ObjectWithPointerToStringArray with data: []string{}",
+			input: ObjectWithPointerToStringArray{
+				Data: &[]string{},
+			},
+			expectedJSON:   "{\"data\":[]}",
+			expectedYAMLV2: "data: []\n",
+			expectedYAMLV3: "data: []\n",
+		},
+		{
+			name: "ObjectWithPointerToStringArray with data in array",
+			input: ObjectWithPointerToStringArray{
+				Data: &[]string{"first string", "second string"},
+			},
+			expectedJSON:   "{\"data\":[\"first string\",\"second string\"]}",
+			expectedYAMLV2: "data:\n- first string\n- second string\n",
+			expectedYAMLV3: "data:\n    - first string\n    - second string\n",
+		},
+
+		// How we can separate nil and [] ?
+		// We can't! nil and empty arrays are not exported.
+		{
+			name:           "ObjectWithOmitEmptyStringArray without data",
 			input:          ObjectWithOmitEmptyStringArray{},
 			expectedJSON:   "{}",
 			expectedYAMLV2: "{}\n",
 			expectedYAMLV3: "{}\n",
 		},
 		{
-			name: "object with omit empty string with data",
+			name: "ObjectWithOmitEmptyStringArray with data: nil",
+			input: ObjectWithOmitEmptyStringArray{
+				Data: nil,
+			},
+			expectedJSON:   "{}",
+			expectedYAMLV2: "{}\n",
+			expectedYAMLV3: "{}\n",
+		},
+		{
+			name: "ObjectWithOmitEmptyStringArray with data: []string{}",
+			input: ObjectWithOmitEmptyStringArray{
+				Data: []string{},
+			},
+			expectedJSON:   "{}",
+			expectedYAMLV2: "{}\n",
+			expectedYAMLV3: "{}\n",
+		},
+		{
+			name: "ObjectWithOmitEmptyStringArray with data in array",
 			input: ObjectWithOmitEmptyStringArray{
 				Data: []string{"first string", "second string"},
+			},
+			expectedJSON:   "{\"data\":[\"first string\",\"second string\"]}",
+			expectedYAMLV2: "data:\n- first string\n- second string\n",
+			expectedYAMLV3: "data:\n    - first string\n    - second string\n",
+		},
+
+		// How we can separate nil and [] ?
+		// We can! nil is not exported, and an empty array as empty array.
+		{
+			name:           "ObjectWithOmitEmptyPointerToStringArray without data",
+			input:          ObjectWithOmitEmptyPointerToStringArray{},
+			expectedJSON:   "{}",
+			expectedYAMLV2: "{}\n",
+			expectedYAMLV3: "{}\n",
+		},
+		{
+			name: "ObjectWithOmitEmptyPointerToStringArray with data: nil",
+			input: ObjectWithOmitEmptyPointerToStringArray{
+				Data: nil,
+			},
+			expectedJSON:   "{}",
+			expectedYAMLV2: "{}\n",
+			expectedYAMLV3: "{}\n",
+		},
+		{
+			name: "ObjectWithOmitEmptyPointerToStringArray with data: []string{}",
+			input: ObjectWithOmitEmptyPointerToStringArray{
+				Data: &[]string{},
+			},
+			expectedJSON:   "{\"data\":[]}",
+			expectedYAMLV2: "data: []\n",
+			expectedYAMLV3: "data: []\n",
+		},
+		{
+			name: "ObjectWithOmitEmptyPointerToStringArray with data in array",
+			input: ObjectWithOmitEmptyPointerToStringArray{
+				Data: &[]string{"first string", "second string"},
 			},
 			expectedJSON:   "{\"data\":[\"first string\",\"second string\"]}",
 			expectedYAMLV2: "data:\n- first string\n- second string\n",

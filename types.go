@@ -9,3 +9,13 @@ type ObjectWithStringArray struct {
 type ObjectWithOmitEmptyStringArray struct {
 	Data []string `json:"data,omitempty" yaml:"data,omitempty"`
 }
+
+// ObjectWithPointerToStringArray is used in tests
+type ObjectWithPointerToStringArray struct {
+	Data *[]string `json:"data" yaml:"data"`
+}
+
+// ObjectWithOmitEmptyPointerToStringArray is used in tests
+type ObjectWithOmitEmptyPointerToStringArray struct {
+	Data *[]string `json:"data,omitempty" yaml:"data,omitempty"`
+}
